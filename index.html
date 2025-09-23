@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="theme-sakura-pink light font-md">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI 唇部美学设计师</title>
+    <link rel="icon" href="https://docs.bccsw.cn/favicon.png" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      :root {
+        --theme-indigo: #4f46e5;
+        --theme-indigo-hover: #4338ca;
+        --theme-text-base: #1f2937;
+        --theme-text-muted: #6b7280;
+        --theme-bg-base: #ffffff;
+        --theme-bg-panel: #f9fafb;
+        --theme-bg-subtle: #f3f4f6;
+        --theme-ring: #6366f1;
+        --theme-border: #e5e7eb;
+      }
+      html.dark {
+        --theme-indigo: #818cf8;
+        --theme-indigo-hover: #6366f1;
+        --theme-text-base: #f9fafb;
+        --theme-text-muted: #9ca3af;
+        --theme-bg-base: #111827;
+        --theme-bg-panel: #1f2937;
+        --theme-bg-subtle: #374151;
+        --theme-ring: #818cf8;
+        --theme-border: #374151;
+      }
+      /* New Themes */
+      html.theme-sakura-pink.light {
+        --theme-indigo: #ec4899;
+        --theme-indigo-hover: #db2777;
+        --theme-text-base: #37303f;
+        --theme-text-muted: #796e83;
+        --theme-bg-base: #fff7fa;
+        --theme-bg-panel: #ffffff;
+        --theme-bg-subtle: #fde8f1;
+        --theme-ring: #f472b6;
+        --theme-border: #fbcfe8;
+      }
+      html.theme-lavender-haze.light {
+        --theme-indigo: #8b5cf6;
+        --theme-indigo-hover: #7c3aed;
+        --theme-text-base: #2d2c42;
+        --theme-text-muted: #6f6d8c;
+        --theme-bg-base: #f5f3ff;
+        --theme-bg-panel: #ffffff;
+        --theme-bg-subtle: #ede9fe;
+        --theme-ring: #a78bfa;
+        --theme-border: #ddd6fe;
+      }
+      html.theme-minty-fresh.light {
+        --theme-indigo: #10b981;
+        --theme-indigo-hover: #059669;
+        --theme-text-base: #1f3a3a;
+        --theme-text-muted: #5a7878;
+        --theme-bg-base: #f0fdfa;
+        --theme-bg-panel: #ffffff;
+        --theme-bg-subtle: #ccfbf1;
+        --theme-ring: #34d399;
+        --theme-border: #a7f3d0;
+      }
+      html.theme-velvet-night.dark {
+        --theme-indigo: #c084fc;
+        --theme-indigo-hover: #a855f7;
+        --theme-text-base: #e9d5ff;
+        --theme-text-muted: #a89cb5;
+        --theme-bg-base: #1a1523;
+        --theme-bg-panel: #2a223e;
+        --theme-bg-subtle: #3e325a;
+        --theme-ring: #d8b4fe;
+        --theme-border: #581c87;
+      }
+      html.font-sm { font-size: 14px; }
+      html.font-md { font-size: 16px; }
+      html.font-lg { font-size: 18px; }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar { width: 8px; height: 8px; }
+      ::-webkit-scrollbar-track { background: var(--theme-bg-subtle); border-radius: 10px; }
+      ::-webkit-scrollbar-thumb { background: #888; border-radius: 10px; }
+      ::-webkit-scrollbar-thumb:hover { background: #555; }
+      
+      /* Compare Slider */
+      .compare-slider { --position: 50%; position: relative; overflow: hidden; user-select: none; }
+      .compare-slider .image-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+      .compare-slider .image-container.original-image { clip-path: polygon(0 0, var(--position) 0, var(--position) 100%, 0 100%); will-change: clip-path; }
+      .compare-slider .slider { position: absolute; top: 0; bottom: 0; left: var(--position); transform: translateX(-50%); width: 4px; background-color: rgba(255, 255, 255, 0.7); cursor: ew-resize; z-index: 10; }
+      .compare-slider .slider-handle { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; background-color: rgba(255, 255, 255, 0.7); border-radius: 50%; display: flex; align-items: center; justify-content: space-between; padding: 0 5px; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+      .compare-slider .slider-handle::before, .compare-slider .slider-handle::after { content: ''; width: 0; height: 0; border-top: 6px solid transparent; border-bottom: 6px solid transparent; }
+      .compare-slider .slider-handle::before { border-right: 8px solid #333; }
+      .compare-slider .slider-handle::after { border-left: 8px solid #333; }
+      
+      /* Mobile Panels */
+      .mobile-footer-panel { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; background-color: var(--theme-bg-panel); border-top: 1px solid var(--theme-border); box-shadow: 0 -4px 20px rgba(0,0,0,0.1); display: flex; flex-direction: column; transition: height 300ms ease-in-out; }
+      .mobile-footer-panel.collapsed { height: 80px; }
+      .mobile-footer-panel.expanded { height: 60vh; }
+      .mobile-footer-panel .panel-content-area { flex: 1 1 0%; overflow-y: auto; visibility: hidden; }
+      .mobile-footer-panel.expanded .panel-content-area { visibility: visible; }
+      .mobile-footer-panel .panel-tabs-bar { display: flex; height: 80px; flex-shrink: 0; border-top: 1px solid var(--theme-border); }
+      .mobile-editor-toolbar { position: fixed; left: 50%; transform: translateX(-50%); z-index: 25; background: var(--theme-bg-panel); padding: 0.5rem; border-radius: 0.75rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 0.5rem; transition: bottom 300ms ease-in-out; }
+
+      /* Splash Screen */
+      #splash-screen {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--theme-bg-base);
+        color: var(--theme-text-base);
+        transition: opacity 0.5s ease-out;
+        overflow: hidden;
+      }
+      #splash-screen.fade-out {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .splash-content { text-align: center; animation: fadeIn 1s ease-out; }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+      .splash-lip-art { width: 120px; height: 120px; margin: 0 auto; stroke: var(--theme-indigo); stroke-width: 1.5; fill: none; animation: lip-pulse 2s infinite ease-in-out; }
+      @keyframes lip-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+      .splash-quote { margin-top: 1.5rem; font-size: 1rem; font-style: italic; max-width: 80%; color: var(--theme-text-muted); }
+      .splash-progress-bar { position: absolute; bottom: 10%; left: 25%; right: 25%; height: 4px; background-color: var(--theme-bg-subtle); border-radius: 2px; overflow: hidden; }
+      .splash-progress-inner { width: 0%; height: 100%; background-color: var(--theme-indigo); border-radius: 2px; transition: width 0.3s ease; }
+      
+      /* Splash Effects */
+      .effect-petals {
+        background: radial-gradient(ellipse at bottom, #ffc9d4, #ffffff);
+      }
+      .effect-petals::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0 C10 0 0 10 0 30 C0 50 10 60 30 60 C50 60 60 50 60 30 C60 10 50 0 30 0 Z' fill='%23fce7f3' fill-opacity='0.2'/%3E%3C/svg%3E");
+        animation: fall 20s linear infinite;
+        opacity: 0.5;
+      }
+      @keyframes fall { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
+
+      .effect-sparkles::before, .effect-sparkles::after {
+        content: '';
+        position: absolute;
+        top: 0; right: 0; bottom: 0; left: 0;
+        background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 0 L12 8 L20 10 L12 12 L10 20 L8 12 L0 10 L8 8 Z' fill='%23a78bfa' fill-opacity='0.3'/%3E%3C/svg%3E");
+        animation: sparkle 15s linear infinite;
+      }
+      .effect-sparkles::after { animation-delay: -7.5s; opacity: 0.7; }
+      @keyframes sparkle { 0% { transform: translateY(-100%) rotate(0deg); } 100% { transform: translateY(100%) rotate(360deg); } }
+
+      .effect-glow { animation: color-glow 10s infinite alternate; }
+      @keyframes color-glow {
+        0% { background-color: #f0f9ff; }
+        50% { background-color: #fdf2f8; }
+        100% { background-color: #f5f3ff; }
+      }
+
+      .effect-light-rays {
+        background: linear-gradient(45deg, rgba(255,255,255,0) 45%, var(--theme-bg-subtle) 50%, rgba(255,255,255,0) 55%, rgba(255,255,255,0) 100%);
+        background-size: 200% 200%;
+        animation: light-rays 12s linear infinite;
+      }
+      @keyframes light-rays {
+          from { background-position: 200% 200%; }
+          to { background-position: -200% -200%; }
+      }
+      
+      /* Actionable Intent Banner Animation */
+      .animate-fade-in-down {
+          animation: fade-in-down 0.5s ease-out forwards;
+      }
+      @keyframes fade-in-down {
+          from {
+              opacity: 0;
+              transform: translate(-50%, -20px);
+          }
+          to {
+              opacity: 1;
+              transform: translate(-50%, 0);
+          }
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@19.0.0-rc.0",
+    "react-dom": "https://esm.sh/react-dom@19.0.0-rc.0",
+    "react-dom/client": "https://esm.sh/react-dom@19.0.0-rc.0/client",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.19.0",
+    "three": "https://esm.sh/three@0.165.0",
+    "three/addons/": "https://esm.sh/three@0.165.0/examples/jsm/",
+    "@react-three/fiber": "https://esm.sh/@react-three/fiber@8.16.8",
+    "@react-three/drei": "https://esm.sh/@react-three/drei@9.105.6",
+    "three/": "https://aistudiocdn.com/three@^0.180.0/",
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-[var(--theme-bg-base)] text-[var(--theme-text-base)]">
+    <div id="splash-screen"></div>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
